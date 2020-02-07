@@ -1,0 +1,1 @@
+﻿Get-Process phoBehavioralBoxLabjackController |   Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
