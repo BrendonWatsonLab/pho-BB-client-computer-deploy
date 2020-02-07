@@ -109,7 +109,7 @@ following command: winrm help config. For more information, see the about_Remote
 
     #Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock { msiexec.exe /i \\10.17.158.49\ClientDeployables\SpiceworksAgentShell_Collection_Agent.msi /qn SITE_KEY="7Q5lNErjMplXI_-B_zAN" }
 
-    Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock { Get-Process phoBehavioralBoxLabjackController |   Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force }
+    Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock { Get-Process phoBehavioralBoxLabjackController | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force }
 }
 
 
@@ -188,7 +188,7 @@ function Invoke-Remote-Get-BB-Client-Software-Processes()
         }  
         catch {
             $props.Add('phoBehavioralBoxLabjackController_Running',$False)
-            $props.Add('phoBehavioralBoxLabjackController_ProcessID','Not running!')
+            $props.Add('phoBehavioralBoxLabjackController_ProcessID','-')
         }
 
         # Check for running OBS Video software processes
@@ -199,7 +199,7 @@ function Invoke-Remote-Get-BB-Client-Software-Processes()
         }  
         catch {
             $props.Add('OBS_Running',$False)
-            $props.Add('OBS_ProcessID','Not running!')
+            $props.Add('OBS_ProcessID','-')
         }
 
         # Return the output object
@@ -210,8 +210,60 @@ function Invoke-Remote-Get-BB-Client-Software-Processes()
 }
 
 
+## Quits the BB Client Software
+function Invoke-Remote-Quit-BB-Client-Software-Processes()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        $props = @{ComputerName=$env:COMPUTERNAME}
+        # Check for running phoBehavioralBoxLabjackController processes
+        try {
+            $potentially_running_process = Get-Process phoBehavioralBoxLabjackController -ErrorAction Stop
+            $props.Add('phoBehavioralBoxLabjackController_WasRunning',$True)
+            # Quit the process
+            $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+            $props.Add('phoBehavioralBoxLabjackController_Terminated',$True)
+        }  
+        catch {
+            $props.Add('phoBehavioralBoxLabjackController_WasRunning',$False)
+            $props.Add('phoBehavioralBoxLabjackController_Terminated',$False)
+        }
 
+        # Check for running OBS Video software processes
+        try {
+            $potentially_running_process = Get-Process obs64 -ErrorAction Stop
+            $props.Add('OBS_WasRunning',$True)
+            # Quit the process
+            $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+            $props.Add('OBS_Terminated',$True)
+        }  
+        catch {
+            $props.Add('OBS_WasRunning',$False)
+            $props.Add('OBS_Terminated',$False)
+        }
 
+        # Return the output object
+        New-Object -Type PSObject -Prop $Props 
+    }
+
+    return $results
+}
+
+function Command-Quit-BB-Software()
+{
+    Param($remote_desktop_computer_names)
+    $bb_software_quit_results = Invoke-Remote-Quit-BB-Client-Software-Processes -remote_desktop_computer_names $remote_desktop_computer_names
+    $bb_software_quit_results_formatted = $bb_software_quit_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_WasRunning, phoBehavioralBoxLabjackController_Terminated, OBS_WasRunning, OBS_Terminated | Sort-Object -Property ComputerName
+    return $bb_software_quit_results_formatted
+}
+
+function Command-Get-Running-BB-Software()
+{
+    Param($remote_desktop_computer_names)
+    $bb_software_status_results = Invoke-Remote-Get-BB-Client-Software-Processes -remote_desktop_computer_names $remote_desktop_computer_names
+    $bb_software_status_results_formatted = $bb_software_status_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_Running, phoBehavioralBoxLabjackController_ProcessID, OBS_Running, OBS_ProcessID | Sort-Object -Property ComputerName
+    return $bb_software_status_results_formatted
+}
 
 
 function Test-CSV-Hosts()
@@ -277,11 +329,29 @@ function Test-CSV-Hosts()
     $phoBBLabjackController_status_results | Select-Object -Property ComputerName, Is_Running, ProcessID | Sort-Object -Property ComputerName | Out-GridView -Title "Client BB Computer Status: phoBehavioralBoxLabjackController software" -PassThru | Export-Csv -Path $phoBB_result_export_csv_path
     #>
 
-    Invoke-Remote-Get-BB-Client-Software-Processes
-    $bb_software_status_results = Invoke-Remote-Get-OBS-Video-Process -remote_desktop_computer_names $recovered_hostnames
+    
+
+    ## Quits all software
+    $quit_results = Command-Quit-BB-Software -remote_desktop_computer_names $recovered_hostnames
+    $bb_software_result_name = "quit_All_Client_Software"
+    $bb_software_result_export_csv_path = $export_remote_command_results_folder + "\" + $bb_software_result_name + ".csv"
+    
+    # GUI Grid View:
+    #$quit_results | Out-GridView -Title "Client BB Computer Quit: All Custom BB software" -PassThru | Export-Csv -Path $bb_software_result_export_csv_path
+    # Inline Table View:
+    $quit_results | Export-Csv -Path $bb_software_result_export_csv_path
+    $quit_results | Format-Table -AutoSize
+
+
+    # Gets all software status
+    $bb_software_status_results = Command-Get-Running-BB-Software -remote_desktop_computer_names $recovered_hostnames
     $bb_software_result_name = "status_All_Client_Software"
     $bb_software_result_export_csv_path = $export_remote_command_results_folder + "\" + $bb_software_result_name + ".csv"
-    $bb_software_status_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_Running, phoBehavioralBoxLabjackController_ProcessID, OBS_Running, OBS_ProcessID | Sort-Object -Property ComputerName | Out-GridView -Title "Client BB Computer Status: All Custom BB software" -PassThru | Export-Csv -Path $bb_software_result_export_csv_path
+    # GUI Grid View:
+    #$bb_software_status_results | Out-GridView -Title "Client BB Computer Status: All Custom BB software" -PassThru | Export-Csv -Path $bb_software_result_export_csv_path
+    # Inline Table View:
+    $bb_software_status_results | Export-Csv -Path $bb_software_result_export_csv_path
+    $bb_software_status_results | Format-Table -AutoSize
 
 }
 
