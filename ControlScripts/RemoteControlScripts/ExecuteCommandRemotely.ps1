@@ -149,7 +149,7 @@ function Invoke-Remote-Get-BBLabjackControlerProcess()
 function Invoke-Remote-Get-OBS-Video-Process()
 {
     Param($remote_desktop_computer_names)
-    Write-Output ("Getting Remote BB Labjack Controller Processes...")
+    Write-Output ("Getting Remote BB OBS Video Software Processes...")
     $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
         $props = @{ComputerName=$env:COMPUTERNAME}
         try {
@@ -169,6 +169,43 @@ function Invoke-Remote-Get-OBS-Video-Process()
     }
 
     Write-Output("    Done.")
+    return $results
+}
+
+
+## A version that gets running process IDs for all BB software at once.
+function Invoke-Remote-Get-BB-Client-Software-Processes()
+{
+    Param($remote_desktop_computer_names)
+    Write-Output ("Getting Remote BB Client Computer Software Processes...")
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        $props = @{ComputerName=$env:COMPUTERNAME}
+        # Check for running phoBehavioralBoxLabjackController processes
+        try {
+            $potentially_running_process = Get-Process phoBehavioralBoxLabjackController -ErrorAction Stop
+            $props.Add('phoBehavioralBoxLabjackController_Running',$True)
+            $props.Add('phoBehavioralBoxLabjackController_ProcessID', $potentially_running_process.Id)
+        }  
+        catch {
+            $props.Add('phoBehavioralBoxLabjackController_Running',$False)
+            $props.Add('phoBehavioralBoxLabjackController_ProcessID','Not running!')
+        }
+
+        # Check for running OBS Video software processes
+        try {
+            $potentially_running_process = Get-Process obs64 -ErrorAction Stop
+            $props.Add('OBS_Running',$True)
+            $props.Add('OBS_ProcessID', $potentially_running_process.Id)
+        }  
+        catch {
+            $props.Add('OBS_Running',$False)
+            $props.Add('OBS_ProcessID','Not running!')
+        }
+
+        # Return the output object
+        New-Object -Type PSObject -Prop $Props 
+    }
+
     return $results
 }
 
@@ -224,11 +261,12 @@ function Test-CSV-Hosts()
     #Invoke-Remote-Command -remote_desktop_computer_names $final_network_addresses
     #Invoke-Remote-Command -remote_desktop_computer_names $recovered_hostnames
 
-
+    <#
     $obs_status_results = Invoke-Remote-Get-OBS-Video-Process -remote_desktop_computer_names $recovered_hostnames
     $obs_result_name = "status_OBS_Video_Software"
     $obs_result_export_csv_path = $export_remote_command_results_folder + "\" + $obs_result_name + ".csv"
     $obs_status_results | Select-Object -Property ComputerName, Is_Running, ProcessID | Sort-Object -Property ComputerName | Out-GridView -Title "Client BB Computer Status: OBS Video software" -PassThru | Export-Csv -Path $obs_result_export_csv_path
+    #>
 
     <#
     # Get phoBehavioralBoxLabjackController running status:
@@ -238,6 +276,13 @@ function Test-CSV-Hosts()
     $phoBB_result_export_csv_path = $export_remote_command_results_folder + "\" + $phoBB_result_name + ".csv"
     $phoBBLabjackController_status_results | Select-Object -Property ComputerName, Is_Running, ProcessID | Sort-Object -Property ComputerName | Out-GridView -Title "Client BB Computer Status: phoBehavioralBoxLabjackController software" -PassThru | Export-Csv -Path $phoBB_result_export_csv_path
     #>
+
+    Invoke-Remote-Get-BB-Client-Software-Processes
+    $bb_software_status_results = Invoke-Remote-Get-OBS-Video-Process -remote_desktop_computer_names $recovered_hostnames
+    $bb_software_result_name = "status_All_Client_Software"
+    $bb_software_result_export_csv_path = $export_remote_command_results_folder + "\" + $bb_software_result_name + ".csv"
+    $bb_software_status_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_Running, phoBehavioralBoxLabjackController_ProcessID, OBS_Running, OBS_ProcessID | Sort-Object -Property ComputerName | Out-GridView -Title "Client BB Computer Status: All Custom BB software" -PassThru | Export-Csv -Path $bb_software_result_export_csv_path
+
 }
 
 
