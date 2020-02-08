@@ -1,4 +1,3 @@
-call "Helpers\EnableRemoteNetworkAdministration.bat"
-call "Helpers\CopyTemplateFilesFromServer.cmd"
-powershell.exe -command ".\Helpers\SpecifyTemplateFilesAndDeploy.ps1"
+REM Called to launch the software. Called on every client startup
+REM call "Helpers\EnableRemoteNetworkAdministration.bat"
 call "Helpers\RunStartupSoftware.cmd"

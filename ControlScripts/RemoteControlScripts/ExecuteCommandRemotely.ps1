@@ -210,6 +210,33 @@ function Invoke-Remote-Get-BB-Client-Software-Processes()
 }
 
 
+function Invoke-Remote-Get-Storage-Space()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        $props = @{ComputerName=$env:COMPUTERNAME}
+        $disk_results = Get-PSDrive | Select-Object Root,Name,Used,Free
+        $props.Add('Disks',$disk_results)
+        
+        #[Math]::Round($Disk.Freespace / 1GB)
+        # Return the output object
+        New-Object -Type PSObject -Prop $Props 
+    }
+
+    return $results
+}
+
+
+function Command-Get-BB-Storage-Space()
+{
+    Param($remote_desktop_computer_names)
+    $bb_software_status_results = Invoke-Remote-Get-Storage-Space -remote_desktop_computer_names $remote_desktop_computer_names
+    $bb_software_status_results_formatted = $bb_software_status_results | Select-Object -Property ComputerName,Root,Name,Used,Free | Sort-Object -Property ComputerName
+    return $bb_software_status_results_formatted
+}
+
+
+
 ## Quits the BB Client Software
 function Invoke-Remote-Quit-BB-Client-Software-Processes()
 {
@@ -264,6 +291,30 @@ function Command-Get-Running-BB-Software()
     $bb_software_status_results_formatted = $bb_software_status_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_Running, phoBehavioralBoxLabjackController_ProcessID, OBS_Running, OBS_ProcessID | Sort-Object -Property ComputerName
     return $bb_software_status_results_formatted
 }
+
+## Reboots the remote machine
+function Invoke-Remote-Reboot()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        Restart-Computer -Force
+    }
+}
+
+
+## Copies the startup script to each remote machine
+function Invoke-Deploy-Startup-Script()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        net use S: \\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare c474115B357 /user:RDE20007\watsonlabBB /persistent:yes
+        S:
+        Copy-Item "S:\BB-Computer-Deploy-01-21-2020\BB_Startup_Script.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+        #call "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+    }
+}
+
+
 
 
 function Test-CSV-Hosts()
@@ -330,7 +381,10 @@ function Test-CSV-Hosts()
     #>
 
     
+    ## Reboots computers
+    Invoke-Remote-Reboot -remote_desktop_computer_names $recovered_hostnames
 
+    <#
     ## Quits all software
     $quit_results = Command-Quit-BB-Software -remote_desktop_computer_names $recovered_hostnames
     $bb_software_result_name = "quit_All_Client_Software"
@@ -341,9 +395,10 @@ function Test-CSV-Hosts()
     # Inline Table View:
     $quit_results | Export-Csv -Path $bb_software_result_export_csv_path
     $quit_results | Format-Table -AutoSize
-
+    #>
 
     # Gets all software status
+    <#
     $bb_software_status_results = Command-Get-Running-BB-Software -remote_desktop_computer_names $recovered_hostnames
     $bb_software_result_name = "status_All_Client_Software"
     $bb_software_result_export_csv_path = $export_remote_command_results_folder + "\" + $bb_software_result_name + ".csv"
@@ -352,6 +407,16 @@ function Test-CSV-Hosts()
     # Inline Table View:
     $bb_software_status_results | Export-Csv -Path $bb_software_result_export_csv_path
     $bb_software_status_results | Format-Table -AutoSize
+    #>
+
+
+    # Gets all software status
+    #$bb_storage_status_results = Command-Get-BB-Storage-Space -remote_desktop_computer_names $recovered_hostnames
+    #$bb_storage_status_results | Format-Table -AutoSize
+
+    #Invoke-Deploy-Startup-Script -remote_desktop_computer_names $recovered_hostnames
+
+    
 
 }
 

@@ -1,0 +1,8 @@
+
+// "All Users" Startup Folder:
+
+C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp
+
+Can also find it by typing 
+"shell:common startup"
+in a Run dialog
