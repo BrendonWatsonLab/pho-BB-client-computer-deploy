@@ -34,7 +34,8 @@ function Get-OBS-Filename-Formatting-String()
 $currentBBID = Get-Current-BehavioralBoxID-From-Hostname
 $currentOBSString = Get-OBS-Filename-Formatting-String
 # $videoOutputPath = "F:/BaslerMovies/Behavioral Boxes Extended"
-$videoOutputPath = "C:\Common\data"
+# $videoOutputPath = "C:\Common\data"
+$videoOutputPath = "E:\Common\data"
 
 $template = Get-Content 'C:\Common\temp\basic.ini' -Raw
 # $template = Get-Content 'C:\Users\watsonlab\AppData\Roaming\obs-studio\basic\profiles\Untitled\basic.ini' -Raw

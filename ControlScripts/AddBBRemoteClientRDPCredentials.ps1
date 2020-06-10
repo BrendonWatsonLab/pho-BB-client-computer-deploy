@@ -16,6 +16,18 @@ function Load-Remote-Computer-Info()
     return $csv_info
 }
 
+function Build-Client-BBIDs()
+{
+    # Build an array of BBIDs like "BB01", "BB02", ...
+    $outputStrings = @()
+    $numberOfBehavioralBoxComputers = 16
+    for ($boxID = 1; $boxID -lt ($numberOfBehavioralBoxComputers + 1); $boxID++) {
+        $currString = "BB{0:d2}" -f $boxID
+        $outputStrings += @($currString)
+    }
+    return $outputStrings
+}
+
 function Build-Client-BB-Hostnames()
 {
 

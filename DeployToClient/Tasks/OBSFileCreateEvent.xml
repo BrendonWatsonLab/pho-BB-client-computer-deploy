@@ -1,0 +1,9 @@
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Sysmon/Operational">
+    <Select Path="Microsoft-Windows-Sysmon/Operational">
+      *[EventData[Data[@Name='Image'] = 'C:\Program Files\OBS Studio (64bit)\bin\64bit\obs64.exe']]
+      and
+      *[System[(EventID=11)]]
+    </Select>
+  </Query>
+</QueryList>

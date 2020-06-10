@@ -1,0 +1,5 @@
+<ViewerConfig><QueryConfig><QueryParams><UserQuery /></QueryParams><QueryNode><Name>Pho BB Software Launch</Name><Description>Pho Behavioral Box software launched</Description><QueryList><Query Id="0" Path="Microsoft-Windows-Sysmon/Operational"><Select Path="Microsoft-Windows-Sysmon/Operational">
+      *[EventData[Data[@Name='Image'] = 'C:\Common\bin\phoBehavioralBoxLabjackController\phoBehavioralBoxLabjackController.exe']]
+      and
+      *[System[(EventID=1)]]
+    </Select></Query></QueryList></QueryNode></QueryConfig></ViewerConfig>

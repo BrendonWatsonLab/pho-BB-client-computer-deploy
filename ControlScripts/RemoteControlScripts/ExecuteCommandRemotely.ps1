@@ -12,63 +12,63 @@ function Load-Remote-Computer-Info()
 }
 
 
-## START General Network Functions:
-function Get-Reverse-Hostname-Lookup-From-IP()
-{
-    Param($remote_desktop_address)
-    #return nslookup $remote_desktop_address
-    try { 
-        return [system.net.dns]::gethostentry($remote_desktop_address)
-    }
-    catch {
-      Write-Output ("Couldn't Resolve " + $remote_desktop_address)
-      return '-'
-    }
-}
+# ## START General Network Functions:
+# function Get-Reverse-Hostname-Lookup-From-IP()
+# {
+#     Param($remote_desktop_address)
+#     #return nslookup $remote_desktop_address
+#     try { 
+#         return [system.net.dns]::gethostentry($remote_desktop_address)
+#     }
+#     catch {
+#       Write-Output ("Couldn't Resolve " + $remote_desktop_address)
+#       return '-'
+#     }
+# }
 
-function Get-Address-From-Hostname()
-{
-    Param($remote_desktop_hostname)
-    try { 
-        return [System.Net.Dns]::GetHostAddresses($remote_desktop_hostname) | where {$_.AddressFamily -notlike "InterNetworkV6"} | foreach {echo $_.IPAddressToString }
-    }
-    catch {
-      Write-Output ("Couldn't Resolve " + $remote_desktop_hostname)
-      return '-'
-    }
-}
+# function Get-Address-From-Hostname()
+# {
+#     Param($remote_desktop_hostname)
+#     try { 
+#         return [System.Net.Dns]::GetHostAddresses($remote_desktop_hostname) | where {$_.AddressFamily -notlike "InterNetworkV6"} | foreach {echo $_.IPAddressToString }
+#     }
+#     catch {
+#       Write-Output ("Couldn't Resolve " + $remote_desktop_hostname)
+#       return '-'
+#     }
+# }
 
-function Get-Computer-Hostname()
-{
-    return $env:computername    
-}
+# function Get-Computer-Hostname()
+# {
+#     return $env:computername    
+# }
 ## END General Network Functions
 
 
-# Adds the remote machine to the local TrustedHosts lists so it can be accessed via its IP address.
-function Add-Remote-Machines-To-TrustedHosts()
-{
-    Param($remote_desktop_IPs)
-    Write-Output ("Adding remote computers to local TrustedHosts...")
-    $rowCount = $remote_desktop_IPs.Count;
-    # Previous TrustedHosts:
-    $curList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
-    Write-Output ("    Initial TrustedHosts: " + $curList)
+# # Adds the remote machine to the local TrustedHosts lists so it can be accessed via its IP address.
+# function Add-Remote-Machines-To-TrustedHosts()
+# {
+#     Param($remote_desktop_IPs)
+#     Write-Output ("Adding remote computers to local TrustedHosts...")
+#     $rowCount = $remote_desktop_IPs.Count;
+#     # Previous TrustedHosts:
+#     $curList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
+#     Write-Output ("    Initial TrustedHosts: " + $curList)
 
-    # Clear TrustedHosts:
-    Set-Item WSMan:\localhost\Client\TrustedHosts -Value "" -Force
+#     # Clear TrustedHosts:
+#     Set-Item WSMan:\localhost\Client\TrustedHosts -Value "" -Force
 
-    for ($loopindex=0; $loopindex -lt $rowCount; $loopindex++)
-    {
-        #$curList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
-        Set-Item WSMan:\localhost\Client\TrustedHosts -Value [string]$remote_desktop_IPs[$loopindex] -Force
-        #Set-Item WSMan:\localhost\Client\TrustedHosts -Concatenate -Value [string]$remote_desktop_IPs[$loopindex]
-    }
-    Write-Output("    Done.")
-    # Updated TrustedHosts:
-    $updatedList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
-    Write-Output ("    Updated TrustedHosts: " + $updatedList)
-}
+#     for ($loopindex=0; $loopindex -lt $rowCount; $loopindex++)
+#     {
+#         #$curList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
+#         Set-Item WSMan:\localhost\Client\TrustedHosts -Value [string]$remote_desktop_IPs[$loopindex] -Force
+#         #Set-Item WSMan:\localhost\Client\TrustedHosts -Concatenate -Value [string]$remote_desktop_IPs[$loopindex]
+#     }
+#     Write-Output("    Done.")
+#     # Updated TrustedHosts:
+#     $updatedList = (Get-Item WSMan:\localhost\Client\TrustedHosts).value
+#     Write-Output ("    Updated TrustedHosts: " + $updatedList)
+# }
 
 
 
@@ -110,6 +110,8 @@ following command: winrm help config. For more information, see the about_Remote
     #Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock { msiexec.exe /i \\10.17.158.49\ClientDeployables\SpiceworksAgentShell_Collection_Agent.msi /qn SITE_KEY="7Q5lNErjMplXI_-B_zAN" }
 
     Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock { Get-Process phoBehavioralBoxLabjackController | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force }
+
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
 }
 
 
@@ -236,37 +238,97 @@ function Command-Get-BB-Storage-Space()
 }
 
 
-
 ## Quits the BB Client Software
+# function Invoke-Remote-Quit-BB-Client-Software-Processes()
+# {
+#     Param($remote_desktop_computer_names)
+#     $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+#         $props = @{ComputerName=$env:COMPUTERNAME}
+#         # Check for running phoBehavioralBoxLabjackController processes
+#         try {
+#             $potentially_running_process = Get-Process phoBehavioralBoxLabjackController -ErrorAction Stop
+#             $props.Add('phoBehavioralBoxLabjackController_WasRunning',$True)
+#             # Quit the process
+#             $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+#             $props.Add('phoBehavioralBoxLabjackController_Terminated',$True)
+#         }  
+#         catch {
+#             $props.Add('phoBehavioralBoxLabjackController_WasRunning',$False)
+#             $props.Add('phoBehavioralBoxLabjackController_Terminated',$False)
+#         }
+
+#         # Check for running OBS Video software processes
+#         try {
+#             $potentially_running_process = Get-Process obs64 -ErrorAction Stop
+#             $props.Add('OBS_WasRunning',$True)
+#             # Quit the process
+#             $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+#             $props.Add('OBS_Terminated',$True)
+#         }  
+#         catch {
+#             $props.Add('OBS_WasRunning',$False)
+#             $props.Add('OBS_Terminated',$False)
+#         }
+
+#         # Return the output object
+#         New-Object -Type PSObject -Prop $Props 
+#     }
+
+#     return $results
+# }
+
+
 function Invoke-Remote-Quit-BB-Client-Software-Processes()
 {
-    Param($remote_desktop_computer_names)
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $remote_desktop_computer_names,
+    
+        [Parameter(Mandatory=$false)]
+        [Switch]
+        $EnableForPhoBB,
+    
+        [Parameter(Mandatory=$false)]
+        [Switch]
+        $EnableForOBS
+    )
+    #Param($remote_desktop_computer_names)
+
     $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
         $props = @{ComputerName=$env:COMPUTERNAME}
-        # Check for running phoBehavioralBoxLabjackController processes
-        try {
-            $potentially_running_process = Get-Process phoBehavioralBoxLabjackController -ErrorAction Stop
-            $props.Add('phoBehavioralBoxLabjackController_WasRunning',$True)
-            # Quit the process
-            $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
-            $props.Add('phoBehavioralBoxLabjackController_Terminated',$True)
-        }  
-        catch {
-            $props.Add('phoBehavioralBoxLabjackController_WasRunning',$False)
-            $props.Add('phoBehavioralBoxLabjackController_Terminated',$False)
+
+        if ($EnableForPhoBB.IsPresent)
+        {
+            # Check for running phoBehavioralBoxLabjackController processes
+            try {
+                $potentially_running_process = Get-Process phoBehavioralBoxLabjackController -ErrorAction Stop
+                $props.Add('phoBehavioralBoxLabjackController_WasRunning',$True)
+                # Quit the process
+                $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+                $props.Add('phoBehavioralBoxLabjackController_Terminated',$True)
+            }  
+            catch {
+                $props.Add('phoBehavioralBoxLabjackController_WasRunning',$False)
+                $props.Add('phoBehavioralBoxLabjackController_Terminated',$False)
+            }
         }
 
-        # Check for running OBS Video software processes
-        try {
-            $potentially_running_process = Get-Process obs64 -ErrorAction Stop
-            $props.Add('OBS_WasRunning',$True)
-            # Quit the process
-            $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
-            $props.Add('OBS_Terminated',$True)
-        }  
-        catch {
-            $props.Add('OBS_WasRunning',$False)
-            $props.Add('OBS_Terminated',$False)
+        
+        if ($EnableForOBS.IsPresent)
+        {
+            # Check for running OBS Video software processes
+            try {
+                $potentially_running_process = Get-Process obs64 -ErrorAction Stop
+                $props.Add('OBS_WasRunning',$True)
+                # Quit the process
+                $potentially_running_process | Foreach-Object { $_.CloseMainWindow() | Out-Null } | stop-process –force
+                $props.Add('OBS_Terminated',$True)
+            }  
+            catch {
+                $props.Add('OBS_WasRunning',$False)
+                $props.Add('OBS_Terminated',$False)
+            }
         }
 
         # Return the output object
@@ -276,10 +338,11 @@ function Invoke-Remote-Quit-BB-Client-Software-Processes()
     return $results
 }
 
+
 function Command-Quit-BB-Software()
 {
     Param($remote_desktop_computer_names)
-    $bb_software_quit_results = Invoke-Remote-Quit-BB-Client-Software-Processes -remote_desktop_computer_names $remote_desktop_computer_names
+    $bb_software_quit_results = Invoke-Remote-Quit-BB-Client-Software-Processes -remote_desktop_computer_names $remote_desktop_computer_names -EnableForPhoBB -EnableForOBS
     $bb_software_quit_results_formatted = $bb_software_quit_results | Select-Object -Property ComputerName, phoBehavioralBoxLabjackController_WasRunning, phoBehavioralBoxLabjackController_Terminated, OBS_WasRunning, OBS_Terminated | Sort-Object -Property ComputerName
     return $bb_software_quit_results_formatted
 }
@@ -311,6 +374,100 @@ function Invoke-Deploy-Startup-Script()
         S:
         Copy-Item "S:\BB-Computer-Deploy-01-21-2020\BB_Startup_Script.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
         #call "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+    }
+}
+
+## Utility:
+function Invoke-Remote-EnableUserPowershellScripts()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
+    }
+}
+
+
+function Invoke-Remote-TaskScheduling()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        #Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
+        #$computer_hostname = Get-Computer-Hostname
+        #$task_path = "c:\Temp\tasks\*.xml"
+        $task_path = "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
+        #$task_path = "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
+        $task_user = "watsonlab"
+        #$task_user = "$computer_hostname\watsonlab"
+        $task_pass = "cajal1852"
+
+        $sch = New-Object -ComObject("Schedule.Service")
+        $sch.connect("localhost")
+        $folder = $sch.GetFolder("\")
+
+        Get-Item $task_path | %{
+	        $task_name = $_.Name.Replace('.xml', '')
+	        $task_xml = Get-Content $_.FullName
+	        $task = $sch.NewTask($null)
+	        $task.XmlText = ($task_xml | out-string)
+	        $folder.RegisterTaskDefinition($task_name, $task, 6, $task_user, $task_pass, 1, $null)
+            #Register-ScheduledTask -Xml (get-content '\\chi-fp01\it\Weekly System Info Report.xml' | out-string) -TaskName "Weekly System Info Report" -User globomantics\administrator -Password P@ssw0rd –Force
+        }
+    }
+
+}
+
+
+
+
+
+
+
+function Invoke-Remote-UploadToOverseer()
+{
+    Param(
+    [Parameter(Mandatory=$true)]
+    [String[]]
+    $remote_desktop_computer_names,
+
+    [Parameter(Mandatory=$false)]
+    [Switch]
+    $EventData,
+
+    [Parameter(Mandatory=$false)]
+    [Switch]
+    $VideoData
+    )
+
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
+        #net use S: \\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare c474115B357 /user:RDE20007\watsonlabBB /persistent:yes
+        #S:
+        # Mount networks drives:
+        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Helpers\MapNetworkDrives.cmd"
+        
+        # Run the upload script:
+        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadDataToOverseer.bat"
+        if ($EventData.IsPresent)
+        {
+            Write-Host "Uploading EventData to Overseer..." -ForeGroundColor Green
+            #start-process "S:\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadEventDataToOverseer.bat"
+            start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadEventDataToOverseer.bat"
+            Write-Host "    Done." -ForeGroundColor Green
+        }
+
+        if ($VideoData.IsPresent)
+        {
+            Write-Host "Uploading Videos to Overseer..." -ForeGroundColor Green
+            #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
+            start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
+            
+            Write-Host "    Done." -ForeGroundColor Green
+        }
+
+        # Run upload script
+        #& S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1
+        #Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1"))
+
     }
 }
 
@@ -382,7 +539,7 @@ function Test-CSV-Hosts()
 
     
     ## Reboots computers
-    Invoke-Remote-Reboot -remote_desktop_computer_names $recovered_hostnames
+    #Invoke-Remote-Reboot -remote_desktop_computer_names $recovered_hostnames
 
     <#
     ## Quits all software
@@ -416,8 +573,16 @@ function Test-CSV-Hosts()
 
     #Invoke-Deploy-Startup-Script -remote_desktop_computer_names $recovered_hostnames
 
-    
+    # Command-Get-Running-BB-Software -remote_desktop_computer_names $recovered_hostnames
 
+    #Invoke-Remote-EnableUserPowershellScripts -remote_desktop_computer_names $recovered_hostnames
+    #Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames
+
+    # Backup to Overseer:
+    #Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames -EventData -VideoData
+    Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames -EventData
+
+    #Invoke-Remote-TaskScheduling -remote_desktop_computer_names $recovered_hostnames
 }
 
 

@@ -1,0 +1,5 @@
+<ViewerConfig><QueryConfig><QueryParams><UserQuery /></QueryParams><QueryNode><Name>OBS Launch</Name><QueryList><Query Id="0" Path="Microsoft-Windows-Sysmon/Operational"><Select Path="Microsoft-Windows-Sysmon/Operational">
+      *[EventData[Data[@Name='Image'] = 'C:\Program Files\OBS Studio (64bit)\bin\64bit\obs64.exe']]
+      and
+      *[System[(EventID=1)]]
+    </Select></Query></QueryList></QueryNode></QueryConfig></ViewerConfig>
