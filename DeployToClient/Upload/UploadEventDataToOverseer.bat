@@ -6,8 +6,8 @@ powershell.exe -command "Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy
 
 REM Maps required Network Drives:
 S:
-call "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Helpers\MapNetworkDrives.cmd"
+call "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\MapNetworkDrives.cmd"
 REM net use I: \\WATSON-BB-OVERSEER\ServerInternal-00 cajal1852 /user:WATSON-BB-OVERSEER\watsonlab /persistent:yes
 REM net use O: \\WATSON-BB-OVERSEER\ServerInternal-01 cajal1852 /user:WATSON-BB-OVERSEER\watsonlab /persistent:yes
 REM Run the upload script:
-powershell.exe -command "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadEventDataToOverseer.ps1"
+powershell.exe -command "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadEventDataToOverseer.ps1"

@@ -92,10 +92,10 @@ function Invoke-Remote-UploadToOverseer()
         #net use S: \\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare c474115B357 /user:RDE20007\watsonlabBB /persistent:yes
         #S:
         # Mount networks drives:
-        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Helpers\MapNetworkDrives.cmd"
+        #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\MapNetworkDrives.cmd"
         
         # Run the upload script:
-        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadDataToOverseer.bat"
+        #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadDataToOverseer.bat"
         if ($EventData.IsPresent)
         {
             Write-Host "Uploading EventData to Overseer..." -ForeGroundColor Green
@@ -107,15 +107,15 @@ function Invoke-Remote-UploadToOverseer()
         if ($VideoData.IsPresent)
         {
             Write-Host "Uploading Videos to Overseer..." -ForeGroundColor Green
-            #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
+            #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadVideosToOverseer.bat"
             start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
             
             Write-Host "    Done." -ForeGroundColor Green
         }
 
         # Run upload script
-        #& S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1
-        #Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1"))
+        #& C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1
+        #Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1"))
 
     }
 }

@@ -372,7 +372,7 @@ function Invoke-Deploy-Startup-Script()
     $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
         net use S: \\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare c474115B357 /user:RDE20007\watsonlabBB /persistent:yes
         S:
-        Copy-Item "S:\BB-Computer-Deploy-01-21-2020\BB_Startup_Script.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+        Copy-Item "C:\Common\repo\pho-BB-client-computer-deploy\BB_Startup_Script.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
         #call "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
     }
 }
@@ -395,7 +395,7 @@ function Invoke-Remote-TaskScheduling()
         #$computer_hostname = Get-Computer-Hostname
         #$task_path = "c:\Temp\tasks\*.xml"
         $task_path = "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
-        #$task_path = "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
+        #$task_path = "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Tasks\UploadEventData.xml"
         $task_user = "watsonlab"
         #$task_user = "$computer_hostname\watsonlab"
         $task_pass = "cajal1852"
@@ -443,10 +443,10 @@ function Invoke-Remote-UploadToOverseer()
         #net use S: \\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare c474115B357 /user:RDE20007\watsonlabBB /persistent:yes
         #S:
         # Mount networks drives:
-        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Helpers\MapNetworkDrives.cmd"
+        #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\MapNetworkDrives.cmd"
         
         # Run the upload script:
-        #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadDataToOverseer.bat"
+        #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadDataToOverseer.bat"
         if ($EventData.IsPresent)
         {
             Write-Host "Uploading EventData to Overseer..." -ForeGroundColor Green
@@ -458,15 +458,15 @@ function Invoke-Remote-UploadToOverseer()
         if ($VideoData.IsPresent)
         {
             Write-Host "Uploading Videos to Overseer..." -ForeGroundColor Green
-            #start-process "S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
+            #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadVideosToOverseer.bat"
             start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
             
             Write-Host "    Done." -ForeGroundColor Green
         }
 
         # Run upload script
-        #& S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1
-        #Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\S:\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadToOverseer.ps1"))
+        #& C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1
+        #Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1"))
 
     }
 }

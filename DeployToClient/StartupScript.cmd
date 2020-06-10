@@ -5,7 +5,7 @@ powershell.exe -command "Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy
 
 REM Map the network drives
 call "Helpers\MapNetworkDrives.cmd"
-cd "S:\BB-Computer-Deploy-01-21-2020\DeployToClient"
+cd "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient"
 S:
 
 REM For Deploy:
