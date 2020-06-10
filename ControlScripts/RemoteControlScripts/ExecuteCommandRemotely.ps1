@@ -394,7 +394,7 @@ function Invoke-Remote-TaskScheduling()
         #Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
         #$computer_hostname = Get-Computer-Hostname
         #$task_path = "c:\Temp\tasks\*.xml"
-        $task_path = "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
+        $task_path = "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Tasks\UploadEventData.xml"
         #$task_path = "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Tasks\UploadEventData.xml"
         $task_user = "watsonlab"
         #$task_user = "$computer_hostname\watsonlab"
@@ -451,7 +451,7 @@ function Invoke-Remote-UploadToOverseer()
         {
             Write-Host "Uploading EventData to Overseer..." -ForeGroundColor Green
             #start-process "S:\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadEventDataToOverseer.bat"
-            start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadEventDataToOverseer.bat"
+            start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadEventDataToOverseer.bat"
             Write-Host "    Done." -ForeGroundColor Green
         }
 
@@ -459,7 +459,7 @@ function Invoke-Remote-UploadToOverseer()
         {
             Write-Host "Uploading Videos to Overseer..." -ForeGroundColor Green
             #start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadVideosToOverseer.bat"
-            start-process "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Upload\UploadVideosToOverseer.bat"
+            start-process "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadVideosToOverseer.bat"
             
             Write-Host "    Done." -ForeGroundColor Green
         }

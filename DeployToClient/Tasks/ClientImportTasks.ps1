@@ -7,7 +7,7 @@ function Get-Computer-Hostname()
 $computer_hostname = Get-Computer-Hostname
 
 #$task_path = "c:\Temp\tasks\*.xml"
-$task_path = "\\RDE20007.umhs.med.umich.edu\BehavioralBoxServerShare\BB-Computer-Deploy-01-21-2020\DeployToClient\Tasks\UploadEventData.xml"
+$task_path = "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Tasks\UploadEventData.xml"
 $task_user = "$computer_hostname\watsonlab"
 $task_pass = "cajal1852"
 
