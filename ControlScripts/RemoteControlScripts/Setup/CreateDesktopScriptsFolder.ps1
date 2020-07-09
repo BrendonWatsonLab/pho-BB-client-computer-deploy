@@ -94,25 +94,25 @@ function Invoke-Remote-Install-Logging-Framework-Folder()
     #Param($remote_desktop_computer_names)
 
     $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
-        $props = @{ComputerName=$env:COMPUTERNAME}
+        #$props = @{ComputerName=$env:COMPUTERNAME}
 
-        Install-Module PSFramework -Force
-        # Set-PSFLoggingProvider -Name logfile -Enabled $true -FilePath 'C:\Common\info\UploadScript.log'
+        #Install-Module PSFramework
+        #Set-PSFLoggingProvider -Name logfile -Enabled $true -FilePath 'C:\Common\info\UploadScript.log'
 
 
         #$props.Add('DesktopPath',$DesktopPath)
 
         # Return the output object
-        New-Object -Type PSObject -Prop $Props 
+        #New-Object -Type PSObject -Prop $Props 
     }
 
-    return $results
+    #return $results
 }
 
 function Test-CSV-Hosts()
 {
     # $active_csv_path = "G:\Google Drive\Modern Behavior Box\Documentation\Computers Info\BB Computer Info Spreadsheet - Export.csv"
-    $active_csv_path = "C:\Users\WatsonLab\Desktop\RDP Info\BB Computer Info Spreadsheet - Export.csv"
+    $active_csv_path = 'C:\Users\WatsonLab\Desktop\RDP Info\BB Computer Info Spreadsheet - Export.csv'
 
     # Loads from CSV
     $loaded_csv_info = Load-Remote-Computer-Info -csv_path $active_csv_path
@@ -145,7 +145,8 @@ function Test-CSV-Hosts()
     # $results = Invoke-Remote-Create-Desktop-Setup-Folder -remote_desktop_computer_names $recovered_hostnames
     # $results
 
-    $results = Invoke-Remote-Install-Logging-Framework-Folder -remote_desktop_computer_names $recovered_hostnames
+    #$results = Invoke-Remote-Install-Logging-Framework-Folder -remote_desktop_computer_names $recovered_hostnames
+    $results = Invoke-Remote-Install-Logging-Framework-Folder -remote_desktop_computer_names $final_network_addresses
     $results
 }
 

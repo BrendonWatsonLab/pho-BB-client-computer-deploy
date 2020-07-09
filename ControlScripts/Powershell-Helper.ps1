@@ -1,4 +1,5 @@
-﻿Install-Module -Name PSSoftware
+﻿Set-PSRepository -Name PSGallery
+Install-Module -Name PSSoftware
 Install-Module -Name xStorage
 
 Install-Module -Name OpenSSHUtils

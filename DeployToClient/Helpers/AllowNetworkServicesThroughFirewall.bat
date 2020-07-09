@@ -65,22 +65,6 @@ if not ERRORLEVEL 1 (
     netsh advfirewall firewall add rule name=!RULE_NAME! dir=out action=allow protocol=TCP localport=!PORT!
 )
 
-REM UDP Ports:
-echo "UDP Ports..."
-REM for /l %%y in (137, 138) do (
-REM     set udpPORT=%%y
-REM     REM echo Opening port !PORT!...
-REM     set udpRULE_NAME="Open NetBIOS UDP Port !udpPORT!"
-REM     echo Proposed Rule: !udpRULE_NAME!
-REM     netsh advfirewall firewall show rule name=!udpRULE_NAME! >nul
-REM     if not ERRORLEVEL 1 (
-REM         echo Rule !udpRULE_NAME! already exists. Skipping.
-REM     ) else (
-REM         echo Rule !udpRULE_NAME! does not exist. Creating...
-REM         netsh advfirewall firewall add rule name=!udpRULE_NAME! dir=in action=allow protocol=UDP localport=!udpPORT!
-REM         netsh advfirewall firewall add rule name=!udpRULE_NAME! dir=out action=allow protocol=UDP localport=!udpPORT!
-REM     )
-REM )
 
 set udpPORT=137
 set udpRULE_NAME="Open NetBIOS UDP Port !udpPORT!"
@@ -125,6 +109,32 @@ if not ERRORLEVEL 1 (
     echo Rule !RULE_NAME! does not exist. Creating...
     netsh advfirewall firewall add rule name=!RULE_NAME! protocol=icmpv6:8,any dir=in action=allow
 )
+
+
+
+REM REM Windows Remote Management Ports:
+REM set PORT=5985
+REM set RULE_NAME="Windows Remote Management (HTTP-In)"
+REM netsh advfirewall firewall show rule name=!RULE_NAME! >nul
+REM if not ERRORLEVEL 1 (
+REM     echo Rule !RULE_NAME! already exists. Skipping.
+REM ) else (
+REM     echo Rule !RULE_NAME! does not exist. Creating...
+REM     netsh advfirewall firewall add rule name=!RULE_NAME! dir=in action=allow protocol=TCP localport=!PORT!
+REM     netsh advfirewall firewall add rule name=!RULE_NAME! dir=out action=allow protocol=TCP localport=!PORT!
+REM )
+
+REM set PORT=5985
+REM set RULE_NAME="Windows Remote Management - Compatibility Mode (HTTP-In)"
+REM netsh advfirewall firewall show rule name=!RULE_NAME! >nul
+REM if not ERRORLEVEL 1 (
+REM     echo Rule !RULE_NAME! already exists. Skipping.
+REM ) else (
+REM     echo Rule !RULE_NAME! does not exist. Creating...
+REM     netsh advfirewall firewall add rule name=!RULE_NAME! dir=in action=allow protocol=TCP localport=!PORT!
+REM     netsh advfirewall firewall add rule name=!RULE_NAME! dir=out action=allow protocol=TCP localport=!PORT!
+REM )
+
 
 
 
