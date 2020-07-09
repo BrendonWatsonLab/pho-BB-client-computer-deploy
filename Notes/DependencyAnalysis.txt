@@ -1,0 +1,36 @@
+### Dependency Analysis:
+
+## C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.bat
+
+    call "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\MapNetworkDrives.cmd"
+    REM Run the upload script:
+    powershell.exe -command "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1"
+
+
+## C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Upload\UploadToOverseer.ps1
+
+    function Upload-EventData()
+    {
+    $localDataOutputPath = "C:\Common\data"
+    $serverDataOutputPath = Get-Overseer-EventData-Path-String
+    ROBOCOPY $localDataOutputPath $serverDataOutputPath /e 
+    }
+
+    function Upload-Videos()
+    {
+    $localVideoPath = Get-Local-Video-Path-String
+    $serverVideoOutputPath = Get-Overseer-Video-Path-String
+    ROBOCOPY $localVideoPath $serverVideoOutputPath /e
+    }
+
+    function Upload-All()
+    {
+        Upload-EventData
+        Upload-Videos
+    }
+
+    $currentBBID = Get-Current-BehavioralBoxID-From-Hostname
+
+    # Upload to the server
+    Upload-All
+

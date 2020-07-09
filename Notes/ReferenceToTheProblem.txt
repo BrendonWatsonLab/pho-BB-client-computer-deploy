@@ -1,0 +1,8 @@
+https://adamtheautomator.com/powershell-logging/
+
+I was running into an error that only occurred when executing a script using scheduled jobs. The script would run fine when executed manually. The issue turned out to be a credential and timing issue. Since the error record ID was in the log file, error messages were clear and using tags, I was able to narrow it down in no time.
+
+Having tried other methods to generate log files and this module is by far the easiest to use.
+
+
+The PSFramework is module works great, is reliable, and gives you the most control over verbose messages.
