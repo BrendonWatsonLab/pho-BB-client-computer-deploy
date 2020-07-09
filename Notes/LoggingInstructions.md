@@ -39,6 +39,8 @@ After much tweaking, this finally allowed me to finally receive the log below wh
 # Complications:
 ## Task Scheduler Refresh Issue:
 This is trivial in retrospect, but Task Scheduler does not automatically refresh to update the task execution status. As a result, right clicking the task and going to "Run" results in the status updating (changing to "Running...") but never changing after that, making it appear as if the task were stuck executing or failing to complete. It was only after I observed that the script successfully finished in my log file and messing around with various exit status codes that I realized one must manually refresh the Task Scheduler (for example using F5) to see the updated execution status.
+https://serverfault.com/questions/798093/powershell-scheduled-task-always-shows-running-even-once-completed
+
 
 ## Session 0 Isolation Mode:
 https://stackoverflow.com/questions/45110750/powershell-task-scheduler-stuck-running
