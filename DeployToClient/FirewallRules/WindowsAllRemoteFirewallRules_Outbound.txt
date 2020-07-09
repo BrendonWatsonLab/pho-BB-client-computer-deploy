@@ -1,0 +1,10 @@
+Name	Group	Profile	Enabled	Action	Override	Program	Local Address	Remote Address	Protocol	Local Port	Remote Port	Authorized Computers	Authorized Local Principals	Local User Owner	Application Package	
+Open NetBIOS TCP Port 135		All	Yes	Allow	No	Any	Any	Any	TCP	135	Any	Any	Any	Any	Any	
+Open NetBIOS TCP Port 139		All	Yes	Allow	No	Any	Any	Any	TCP	139	Any	Any	Any	Any	Any	
+Open NetBIOS TCP Port 274		All	Yes	Allow	No	Any	Any	Any	TCP	274	Any	Any	Any	Any	Any	
+Open NetBIOS TCP Port 413		All	Yes	Allow	No	Any	Any	Any	TCP	413	Any	Any	Any	Any	Any	
+Open NetBIOS TCP Port 445		All	Yes	Allow	No	Any	Any	Any	TCP	445	Any	Any	Any	Any	Any	
+Open NetBIOS UDP Port 137		All	Yes	Allow	No	Any	Any	Any	UDP	137	Any	Any	Any	Any	Any	
+Open NetBIOS UDP Port 138		All	Yes	Allow	No	Any	Any	Any	UDP	138	Any	Any	Any	Any	Any	
+Windows Management Instrumentation (WMI-Out)	Windows Management Instrumentation (WMI)	Domain	Yes	Allow	No	%SystemRoot%\system32\svchost.exe	Any	Any	TCP	Any	Any	Any	Any	Any	Any	
+Windows Management Instrumentation (WMI-Out)	Windows Management Instrumentation (WMI)	Private, Public	Yes	Allow	No	%SystemRoot%\system32\svchost.exe	Any	Local subnet	TCP	Any	Any	Any	Any	Any	Any	
