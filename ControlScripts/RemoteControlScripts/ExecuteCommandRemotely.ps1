@@ -387,6 +387,17 @@ function Invoke-Remote-EnableUserPowershellScripts()
 }
 
 
+function Invoke-Remote-InstallLoggingFramework()
+{
+    Param($remote_desktop_computer_names)
+    $results = Invoke-CommandAs -ComputerName $remote_desktop_computer_names -Credential watsonlab -RunElevated -ScriptBlock {
+        Install-Module PSFramework -Force
+        Set-PSFLoggingProvider -Name logfile -Enabled $true -FilePath 'C:\Common\info\UploadScript.log'
+
+    }
+}
+
+
 function Invoke-Remote-TaskScheduling()
 {
     Param($remote_desktop_computer_names)
@@ -479,7 +490,10 @@ function Test-CSV-Hosts()
     $computer_hostname = Get-Computer-Hostname
     $computer_hostname
 
-    $active_csv_path = "G:\Google Drive\Modern Behavior Box\Documentation\Computers Info\BB Computer Info Spreadsheet - Export.csv"
+    # $active_csv_path = "G:\Google Drive\Modern Behavior Box\Documentation\Computers Info\BB Computer Info Spreadsheet - Export.csv"
+    # $active_csv_path = "C:\Users\WatsonLab\Desktop\RDP Info\RdpCredentials_enhanced_backup.csv"
+    $active_csv_path = "C:\Users\WatsonLab\Desktop\RDP Info\BB Computer Info Spreadsheet - Export.csv"
+
     
     # Loads from CSV
     $loaded_csv_info = Load-Remote-Computer-Info -csv_path $active_csv_path
@@ -503,6 +517,9 @@ function Test-CSV-Hosts()
     # Get fully resolved network addresses from recovered host names:
     $final_network_addresses = $recovered_hostnames | ForEach-Object {Get-Address-From-Hostname -remote_desktop_hostname $_}
 
+    # $recovered_hostnames = $active_csv_info.HostName
+
+    
     #$recovered_hostnames
     
     # Add remote machines to the local TrustedHosts list so it can be accessed via its IP address.:
@@ -580,8 +597,9 @@ function Test-CSV-Hosts()
 
     # Backup to Overseer:
     #Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames -EventData -VideoData
-    Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames -EventData
+    # Invoke-Remote-UploadToOverseer -remote_desktop_computer_names $recovered_hostnames -EventData
 
+    Invoke-Remote-InstallLoggingFramework -remote_desktop_computer_names $recovered_hostnames -EventData
     #Invoke-Remote-TaskScheduling -remote_desktop_computer_names $recovered_hostnames
 }
 

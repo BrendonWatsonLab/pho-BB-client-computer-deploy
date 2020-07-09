@@ -11,6 +11,7 @@ Install-Module -Name TaskRunner
 Install-Module -Name PSDeploy
 Install-Module -Name Start-parallel
 Install-Module -Name Invoke-CommandAs # Invoke Command as System/User on Local/Remote computer using ScheduleTask.
+Install-Module PSFramework
 
 # Config:
 Install-Module -Name ReverseDSC
