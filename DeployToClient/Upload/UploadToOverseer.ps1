@@ -1,4 +1,5 @@
 Set-PSFLoggingProvider -Name logfile -Enabled $true -FilePath 'C:\Common\info\UploadScript.log'
+# The first line sets up a common log file location at 'C:\Common\info\UploadScript.log'
 
 # Include the Invoke-Robocopy script.
 . "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\Invoke-Robocopy.ps1"
@@ -6,33 +7,15 @@ Set-PSFLoggingProvider -Name logfile -Enabled $true -FilePath 'C:\Common\info\Up
 # Include the Start-ConsoleProcess script.
 . "C:\Common\repo\pho-BB-client-computer-deploy\DeployToClient\Helpers\Start-ConsoleProcess.ps1"
 
-# function Perform-ROBOCOPY()
-# {
-
-# 	if ($lastexitcode -eq 0)
-# 	{
-# 		 write-host "Robocopy succeeded"
-# 	}
-#    else
-#    {
-# 		 write-host "Robocopy failed with exit code:" $lastexitcode
-#    }
-
-# }
-
 function Invoke-Mount-Overseer-Network-Drive()
 {
-	# Invoke Net use:
-	# $Result = Start-ConsoleProcess -FilePath 'robocopy.exe' -ArgumentList $AllArguments
-	# net use I: \\WATSON-BB-OVERSEER\ServerInternal-00 cajal1852 /user:WATSON-BB-OVERSEER\watsonlab /persistent:yes
-	# 'aaa', 'bbb', 'ccc' | Start-ConsoleProcess -FilePath find -ArgumentList '"aaa"'
+	# This function effectively wraps the command "net use I: \\WATSON-BB-OVERSEER\ServerInternal-00 cajal1852 /user:WATSON-BB-OVERSEER\watsonlab /persistent:yes" using Start-ConsoleProcess to prevent its output (either to stderr or stdout) from polluting the return results of the functions that call it.
+		# net use I: \\WATSON-BB-OVERSEER\ServerInternal-00 cajal1852 /user:WATSON-BB-OVERSEER\watsonlab /persistent:yes
 	$AllArguments = @('use', 'I:', '\\WATSON-BB-OVERSEER\ServerInternal-00', 'cajal1852', '/user:WATSON-BB-OVERSEER\watsonlab', '/persistent:yes')
-	# $AllArguments = @('use', 'I:', '\\WATSON-BB-OVERSEER\ServerInternal-00', 'cajal1852', '/user:WATSON-BB-OVERSEER\watsonlab', '/persistent:yes')
-	# $AllArguments = @('use', 'I:', '\\\\WATSON-BB-OVERSEER\\ServerInternal-00', 'cajal1852', '/user:WATSON-BB-OVERSEER\\watsonlab', '/persistent:yes')
 	$Result = Start-ConsoleProcess -FilePath net -ArgumentList $AllArguments
+	# We ultimately don't return the result, because we just check whether the remote path is still inaccessible after this remount attempt.
 	# return $Result
 }
-
 function Get-Computer-Hostname()
 {
 	return $env:computername    
@@ -107,21 +90,13 @@ function Get-Local-Video-Path-String()
 	}
 	return $currentString
 }
-
-# function Fix-Path()
-# {
-# 	Set-Location FILESYSTEM::Z:
-# }
-
 function Upload-EventData()
 {
 	$completionSuccess = $false
 	$localDataOutputPath = "C:\Common\data"
 	try {
 		$serverDataOutputPath = Get-Overseer-EventData-Path-String -ErrorAction Stop
-		
-		Write-PSFMessage -Level Debug -Message ('Upload-EventData: serverDataOutputPath: ' + $serverDataOutputPath)
-		
+		# Write-PSFMessage -Level Debug -Message ('Upload-EventData: serverDataOutputPath: ' + $serverDataOutputPath)
 	}
 	catch {
 		Write-PSFMessage -Level Warning -Message 'Error using Get-Overseer-EventData-Path-String in Upload-EventData().' -Tag 'Failure' -ErrorRecord $_
